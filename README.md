@@ -97,12 +97,25 @@ through the user session and replies via the Bot API.
 - Posters are generated with a three-step fallback: batch image → Telegram thumbnail →
   FFmpeg frame.
 
+## Naming and posters
+
+Every batch becomes one 115 folder, named by this priority chain:
+
+1. the message caption, cleaned of URLs and illegal characters
+2. a meaningful original filename — client-generated names such as
+   `document_2026-08-12_07-25-28.mp4`, `IMG_6168.M4V` or `video_123.mp4` are rejected
+3. `未命名-<message id>` as the last resort
+
+Names are byte-truncated and de-duplicated per source, so two posts with the same caption
+never collide. Each batch also gets a `poster.jpg`, built with a three-step fallback:
+a batch image → the Telegram video thumbnail → an FFmpeg frame grab.
+
 ## Layout
 
 ```
 source/forwarder/   reply-triggered batch forwarder (Telethon)
 source/watch115/    target-group watcher + 115 uploader
-source/archive/     optional NAS archiver (kept, not started by default)
+source/archive/     naming + poster helpers (required) plus the optional NAS archiver
 container/          supervisord config + healthcheck
 tests/              unittest suite, runs during docker build
 ```
@@ -123,8 +136,9 @@ tests/              unittest suite, runs during docker build
 ## Notes
 
 - The image contains no credentials; everything sensitive is mounted at runtime.
-- `source/archive/` is the older NAS path and is not started by the container. Drop it if you
-  do not need it.
+- `source/archive/` holds two different things: the **naming and poster helpers** that the
+  main pipeline imports (`batch_title`, `unique_dir_name`, `make_poster`) and the older NAS
+  archiver. The helpers are required; only the NAS transfer itself is dormant.
 - 115 credentials are read from the official bot's database and never logged.
 
 ---
@@ -165,6 +179,18 @@ docker compose up -d --build
 `/watch_user_add` 加白名单发送者，`/watch_cid` 设 115 目录。
 
 之后在来源频道里回复任意媒体并发送「转发」，剩下的自动完成。
+
+### 命名与封面
+
+每批内容对应 115 上的一个目录，名字按优先级取：
+
+1. 消息文字（洗掉 URL 和非法字符）
+2. 有意义的原始文件名 —— `document_2026-08-12_07-25-28.mp4`、`IMG_6168.M4V`、
+   `video_123.mp4` 这类客户端自动生成的名字会被识别并跳过
+3. 兜底 `未命名-<消息 id>`
+
+目录名按字节截断，并在同一来源内去重，两条文案相同的帖子不会撞名。
+每批还会生成一张 `poster.jpg`，三级回退：批次图片 → Telegram 视频缩略图 → FFmpeg 截帧。
 
 ### 设计要点
 
