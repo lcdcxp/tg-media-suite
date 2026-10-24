@@ -1,5 +1,7 @@
 # tg-media-suite
 
+[![test](https://github.com/lcdcxp/tg-media-suite/actions/workflows/test.yml/badge.svg)](https://github.com/lcdcxp/tg-media-suite/actions/workflows/test.yml)
+
 A single-container pipeline that moves media out of Telegram and into a 115 cloud drive:
 watch a channel, reply **转发** to a post, and the batch is re-uploaded to a target group,
 then archived to 115 with a generated poster.
