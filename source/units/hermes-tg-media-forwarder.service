@@ -1,0 +1,19 @@
+[Unit]
+Description=Telegram manual media forwarder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/.hermes/automations/tg-media-forwarder
+ExecStart=/root/.hermes/automations/tg-media-forwarder/.venv/bin/python /root/.hermes/automations/tg-media-forwarder/manual_forwarder.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/root/.hermes/automations/tg-media-forwarder
+
+[Install]
+WantedBy=default.target

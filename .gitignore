@@ -1,0 +1,10 @@
+.env
+data/
+115bot/
+*.session
+*.session-journal
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+.DS_Store

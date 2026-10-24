@@ -1,0 +1,8 @@
+httpx==0.28.1
+p115client==0.0.9.6.5.1
+pillow==12.3.0
+pyaes==1.6.1
+qrcode==8.2
+rsa==4.9.1
+supervisor==4.3.0
+Telethon==1.44.0

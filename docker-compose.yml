@@ -1,0 +1,36 @@
+services:
+  tg-media-suite:
+    build: .
+    image: tg-media-suite:latest
+    container_name: tg-media-suite
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      RUNNING_IN_CONTAINER: "1"
+      # Writable state: batches, watch state, staging, generated posters.
+      FORWARDER_DATA_DIR: /data/forwarder
+      WATCH115_DATA_DIR: /data/forwarder/watch115
+      SUITE_CONFIG_PATH: /data/config/config.json
+      WATCH115_SENDERS_FILE: /data/config/senders.json
+      # Read-only view of the official 115bot container.
+      FORWARDER_BOT_PROPERTIES: /run/115bot/application.properties
+      WATCH115_BOT_PROPERTIES: /run/115bot/application.properties
+      WATCH115_BOT_DB: /run/115bot/data/115bot.db
+      FORWARDER_DOWNLOAD_CONCURRENCY: ${FORWARDER_DOWNLOAD_CONCURRENCY:-3}
+      FORWARDER_DOWNLOAD_RETRIES: ${FORWARDER_DOWNLOAD_RETRIES:-3}
+    volumes:
+      - ./data:/data
+      # The 115bot service owns these two paths; mount them read-only.
+      - ./115bot/application.properties:/run/115bot/application.properties:ro
+      - ./115bot/data:/run/115bot/data:ro
+    mem_limit: 2g
+    pids_limit: 256
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: "5"

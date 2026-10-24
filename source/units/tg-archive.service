@@ -1,0 +1,21 @@
+[Unit]
+Description=Telegram forwarded media archiver to Synology NAS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tg-archive
+ExecStart=/root/.hermes/automations/tg-media-forwarder/.venv/bin/python /opt/tg-archive/archiver.py
+Restart=always
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/root
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+# 看板现在写在 /opt/tg-archive/web 里（由登录门读取），不再需要 /var/www
+ReadWritePaths=/opt/tg-archive /root/.ssh
+
+[Install]
+WantedBy=multi-user.target
